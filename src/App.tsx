@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { type ChangeEvent, useState } from "react";
 
 import logo from "./assets/logo-nlw-expert.svg";
 import { NewNoteCard } from "./components/NewNoteCard";
@@ -13,6 +13,7 @@ interface Note {
 const LOCAL_STORAGE_KEY = "@expert-notes";
 
 export function App() {
+  const [search, setSearch] = useState("");
   const [notes, setNotes] = useState<Note[]>(() => {
     const notesOnStorage = localStorage.getItem(`${LOCAL_STORAGE_KEY}-notes`);
 
@@ -40,6 +41,19 @@ export function App() {
     );
   }
 
+  function handleSearch(event: ChangeEvent<HTMLInputElement>) {
+    const query = event.target.value;
+
+    setSearch(query);
+  }
+
+  const filteredNotes =
+    search !== ""
+      ? notes.filter((note) =>
+          note.content.toLocaleLowerCase().includes(search.toLocaleLowerCase())
+        )
+      : notes;
+
   return (
     <div className="mx-auto my-12 max-w-6xl space-y-6">
       <img src={logo} alt="Logo" />
@@ -47,6 +61,7 @@ export function App() {
       <form className="w-full">
         <input
           type="text"
+          onChange={handleSearch}
           placeholder="Busque em suas notas..."
           className="w-full bg-transparent text-3xl font-semibold tracking-tight outline-none placeholder:text-slate-500"
         />
@@ -57,7 +72,7 @@ export function App() {
       <div className="grid auto-rows-[250px] grid-cols-3 gap-6">
         <NewNoteCard onNoteCreate={onNoteCreate} />
 
-        {notes.map((note) => (
+        {filteredNotes.map((note) => (
           <NoteCard key={note.id} note={note} />
         ))}
       </div>
