@@ -10,8 +10,18 @@ interface Note {
   content: string;
 }
 
+const LOCAL_STORAGE_KEY = "@expert-notes";
+
 export function App() {
-  const [notes, setNotes] = useState<Note[]>([]);
+  const [notes, setNotes] = useState<Note[]>(() => {
+    const notesOnStorage = localStorage.getItem(`${LOCAL_STORAGE_KEY}-notes`);
+
+    if (notesOnStorage) {
+      return JSON.parse(notesOnStorage);
+    }
+
+    return [];
+  });
 
   function onNoteCreate(content: string) {
     const newNote: Note = {
@@ -23,6 +33,11 @@ export function App() {
     const notesArray = [newNote, ...notes];
 
     setNotes(notesArray);
+
+    localStorage.setItem(
+      `${LOCAL_STORAGE_KEY}-notes`,
+      JSON.stringify(notesArray)
+    );
   }
 
   return (
