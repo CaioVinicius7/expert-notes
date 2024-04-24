@@ -15,7 +15,7 @@ const LOCAL_STORAGE_KEY = "@expert-notes";
 export function App() {
   const [search, setSearch] = useState("");
   const [notes, setNotes] = useState<Note[]>(() => {
-    const notesOnStorage = localStorage.getItem(`${LOCAL_STORAGE_KEY}-notes`);
+    const notesOnStorage = localStorage.getItem(`${LOCAL_STORAGE_KEY}:notes`);
 
     if (notesOnStorage) {
       return JSON.parse(notesOnStorage);
@@ -37,6 +37,17 @@ export function App() {
 
     localStorage.setItem(
       `${LOCAL_STORAGE_KEY}-notes`,
+      JSON.stringify(notesArray)
+    );
+  }
+
+  function onNoteDelete(id: string) {
+    const notesArray = notes.filter((note) => note.id !== id);
+
+    setNotes(notesArray);
+
+    localStorage.setItem(
+      `${LOCAL_STORAGE_KEY}:notes`,
       JSON.stringify(notesArray)
     );
   }
@@ -73,7 +84,7 @@ export function App() {
         <NewNoteCard onNoteCreate={onNoteCreate} />
 
         {filteredNotes.map((note) => (
-          <NoteCard key={note.id} note={note} />
+          <NoteCard key={note.id} note={note} onNoteDelete={onNoteDelete} />
         ))}
       </div>
     </div>
